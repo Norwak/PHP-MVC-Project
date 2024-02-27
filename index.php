@@ -1,6 +1,6 @@
 <?php
 
-require "src/controllers/products.controller.php";
+require "src/products/products.controller.php";
 $controller = new ProductsController;
 
 $controller->index();
