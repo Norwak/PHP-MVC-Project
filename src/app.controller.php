@@ -2,7 +2,7 @@
 
 class AppController {
 
-  function showAll() {
+  function index() {
     require "app_index.view.php";
   }
 

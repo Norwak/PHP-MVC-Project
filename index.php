@@ -1,34 +1,43 @@
 <?php
-require "src/app.controller.php";
-require "src/products/products.controller.php";
+require "src/router.php";
 
 
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$segments = explode('/', $path);
 
-$controllerName = (array_key_exists(1, $segments) && $segments[1]) ? $segments[1] : 'home';
-$controllerAction = (array_key_exists(2, $segments) && $segments[2]) ? $segments[2] : 'showAll';
+$router = new Router;
+$router->add('/', [
+  "controllerPath" => "src/app.controller.php",
+  "controller" => "AppController",
+  "action" => "index",
+]);
+$router->add('/products', [
+  "controllerPath" => "src/products/products.controller.php",
+  "controller" => "ProductsController",
+  "action" => "showAll",
+]);
 
-$controllerMap = [
-  'home' => 'AppController',
-  'products' => 'ProductsController'
-];
+$params = $router->match($path);
 
-$controllerName = array_key_exists($controllerName, $controllerMap) ? $controllerMap[$controllerName] : '';
-
-
-
-if ($controllerName) {
-  $controller = new $controllerName;
-} else {
+if (!$params) {
   http_response_code(404);
+  echo 'No route matched';
   return;
 }
 
-if (method_exists($controller, $controllerAction)) {
-  $controller->$controllerAction();
+
+
+$controllerName = $params['controller'];
+$controllerPath = $params['controllerPath'];
+$action = $params['action'];
+
+require $controllerPath;
+$controller = new $controllerName;
+
+if (method_exists($controller, $action)) {
+  $controller->$action();
 } else {
   http_response_code(404);
+  echo 'No route matched';
   return;
 }
