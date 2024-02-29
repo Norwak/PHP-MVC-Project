@@ -1,6 +1,6 @@
 <?php
 
-class ProductsModel {
+class Product {
 
   function getData(): array {
     $host = 'localhost';

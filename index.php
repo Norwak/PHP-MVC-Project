@@ -1,43 +1,36 @@
 <?php
+
 require "src/router.php";
 
-
+$router = new Router();
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$segments = explode("/", $path);
 
-$router = new Router;
 $router->add('/', [
-  "controllerPath" => "src/app.controller.php",
-  "controller" => "AppController",
-  "action" => "index",
+  "controller" => "home",
+  "action" => "index"
+]);
+$router->add('/home/index', [
+  "controller" => "home",
+  "action" => "index"
 ]);
 $router->add('/products', [
-  "controllerPath" => "src/products/products.controller.php",
-  "controller" => "ProductsController",
-  "action" => "showAll",
+  "controller" => "home",
+  "action" => "index"
 ]);
 
 $params = $router->match($path);
 
 if (!$params) {
   http_response_code(404);
-  echo 'No route matched';
-  return;
+  exit('No route matched');
 }
-
-
 
 $controllerName = $params['controller'];
-$controllerPath = $params['controllerPath'];
 $action = $params['action'];
 
-require $controllerPath;
-$controller = new $controllerName;
+require "src/controllers/$controllerName.php";
 
-if (method_exists($controller, $action)) {
-  $controller->$action();
-} else {
-  http_response_code(404);
-  echo 'No route matched';
-  return;
-}
+$controller = new $controllerName;
+$controller->$action();
