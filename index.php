@@ -1,11 +1,14 @@
 <?php
 
-require "src/router.php";
-
-$router = new Router();
-
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$segments = explode("/", $path);
+
+spl_autoload_register(function(string $class_name) {
+  var_dump($class_name);
+  $class_name = str_replace('\\', '/', $class_name);
+  require "src/$class_name.php";
+});
+
+$router = new Framework\Router();
 
 $router->add('/', [
   "controller" => "home",
@@ -16,7 +19,7 @@ $router->add('/home/index', [
   "action" => "index"
 ]);
 $router->add('/products', [
-  "controller" => "home",
+  "controller" => "products",
   "action" => "index"
 ]);
 
@@ -27,10 +30,8 @@ if (!$params) {
   exit('No route matched');
 }
 
-$controllerName = $params['controller'];
+$controllerName = 'App\Controllers\\' . ucwords($params['controller']);
 $action = $params['action'];
-
-require "src/controllers/$controllerName.php";
 
 $controller = new $controllerName;
 $controller->$action();

@@ -1,10 +1,10 @@
 <?php
+namespace App\Controllers;
+use App\Models\Product;
 
 class Products {
 
   function index() {
-    require "src/models/product.php";
-
     $model = new Product;
     $products = $model->getData();
 
