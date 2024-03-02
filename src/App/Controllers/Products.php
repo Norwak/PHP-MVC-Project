@@ -1,6 +1,7 @@
 <?php
 namespace App\Controllers;
 use App\Models\Product;
+use Framework\Viewer;
 
 class Products {
 
@@ -8,11 +9,27 @@ class Products {
     $model = new Product;
     $products = $model->getData();
 
-    require "views/products_index.php";
+    $viewer = new Viewer;
+
+    echo $viewer->render('shared/header.php', [
+      "title" => "All products"
+    ]);
+
+    echo $viewer->render('Products/index.php', [
+      "products" => $products
+    ]);
   }
 
   function show(string $id) {
-    require "views/products_show.php";
+    $viewer = new Viewer;
+
+    echo $viewer->render('shared/header.php', [
+      "title" => "A single product"
+    ]);
+
+    echo $viewer->render('Products/show.php', [
+      "id" => $id
+    ]);
   }
 
   function showPage(string $title, string $id, string $page) {
