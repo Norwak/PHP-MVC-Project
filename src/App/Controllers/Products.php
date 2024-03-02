@@ -11,8 +11,11 @@ class Products {
     require "views/products_index.php";
   }
 
-  function show() {
+  function show(string $id) {
     require "views/products_show.php";
   }
 
+  function showPage(string $title, string $id, string $page) {
+
+  }
 }

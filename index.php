@@ -9,6 +9,13 @@ spl_autoload_register(function(string $class_name) {
 
 $router = new Framework\Router();
 
+$router->add('/admin/{controller}/{action}', [
+  "namespace" => "Admin",
+]);
+$router->add('/{title}/{id:\d+}/{page:\d+}', [
+  "controller" => "products",
+  "action" => "showPage",
+]);
 $router->add('/product/{slug:[\w-]+}', [
   "controller" => "products",
   "action" => "show",
@@ -28,15 +35,8 @@ $router->add('/', [
 ]);
 $router->add('/{controller}/{action}');
 
-$params = $router->match($path);
 
-if (!$params) {
-  http_response_code(404);
-  exit('No route matched');
-}
 
-$controllerName = 'App\Controllers\\' . ucwords($params['controller']);
-$action = $params['action'];
+$dispatcher = new Framework\Dispatcher($router);
 
-$controller = new $controllerName;
-$controller->$action();
+$dispatcher->handle($path);
