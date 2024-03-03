@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
@@ -37,6 +38,15 @@ $router->add('/{controller}/{action}');
 
 
 
-$dispatcher = new Framework\Dispatcher($router);
+$container = new Framework\Container();
+$container->set(App\Database::class, function() {
+  $host = 'localhost';
+  $db = 'product_db';
+  $user = 'root';
+  $password = '';
+  return new App\Database($host, $db, $user, $password);
+});
+
+$dispatcher = new Framework\Dispatcher($router, $container);
 
 $dispatcher->handle($path);
