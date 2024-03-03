@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Framework;
 use ReflectionMethod;
+use Framework\Exceptions\NotFoundException;
 
 class Dispatcher {
 
@@ -50,7 +51,7 @@ class Dispatcher {
 
     if (!$params) {
       http_response_code(404);
-      exit('No route matched');
+      throw new NotFoundException("No route matched for '$path'");
     }
 
     $controllerName = $this->getControllerName($params);
