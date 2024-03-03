@@ -1,32 +1,16 @@
 <?php
 declare(strict_types=1);
 
-set_error_handler(function(int $errno, string $errstr, string $errfile, int $errline): bool {
-  throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+spl_autoload_register(function(string $class_name) {
+  $class_name = str_replace('\\', '/', $class_name);
+  require "src/$class_name.php";
 });
 
-set_exception_handler(function(Throwable $exception) {
+$dotenv = new Framework\Dotenv();
+$dotenv->load('.env');
 
-  if ($exception instanceof Framework\Exceptions\NotFoundException) {
-    http_response_code(404);
-    $template = '404.php';
-  } else {
-    http_response_code(500);
-    $template = '500.php';
-  }
-
-  $show_errors = false;
-
-  if ($show_errors) {
-    ini_set('display_errors', '1');
-  } else {
-    ini_set('display_errors', '0');
-    ini_set('log_errors', '1');
-    require "views/$template";
-  }
-
-  throw $exception;
-});
+set_error_handler('Framework\ErrorHandler::handleError');
+set_exception_handler('Framework\ErrorHandler::handleException');
 
 
 
@@ -36,50 +20,9 @@ if ($path === false) {
   throw new UnexpectedValueException("Malformed URL: '{$_SERVER["REQUEST_URI"]}'");
 }
 
-spl_autoload_register(function(string $class_name) {
-  $class_name = str_replace('\\', '/', $class_name);
-  require "src/$class_name.php";
-});
-
-$router = new Framework\Router();
-
-$router->add('/admin/{controller}/{action}', [
-  "namespace" => "Admin",
-]);
-$router->add('/{title}/{id:\d+}/{page:\d+}', [
-  "controller" => "products",
-  "action" => "showPage",
-]);
-$router->add('/product/{slug:[\w-]+}', [
-  "controller" => "products",
-  "action" => "show",
-]);
-$router->add('/{controller}/{id:\d+}/{action}');
-$router->add('/home/index', [
-  "controller" => "home",
-  "action" => "index"
-]);
-$router->add('/products', [
-  "controller" => "products",
-  "action" => "index"
-]);
-$router->add('/', [
-  "controller" => "home",
-  "action" => "index"
-]);
-$router->add('/{controller}/{action}');
 
 
-
-$container = new Framework\Container();
-$container->set(App\Database::class, function() {
-  $host = 'localhost';
-  $db = 'product_db';
-  $user = 'root';
-  $password = '';
-  return new App\Database($host, $db, $user, $password);
-});
-
+$router = require 'config/routes.php';
+$container = require 'config/services.php';
 $dispatcher = new Framework\Dispatcher($router, $container);
-
 $dispatcher->handle($path);
