@@ -1,6 +1,7 @@
 <?php
 namespace Framework;
 use ReflectionMethod;
+use ReflectionClass;
 
 class Dispatcher {
 
@@ -8,7 +9,8 @@ class Dispatcher {
     private Router $router,
   ) {}
 
-  private function getActionArgument(string $controller, string $action, array $params): array {
+
+  private function getActionArguments(string $controller, string $action, array $params): array {
     $args = [];
 
     $method = new ReflectionMethod($controller, $action);
@@ -20,12 +22,12 @@ class Dispatcher {
     return $args;
   }
 
+
   private function getControllerName(array $params): string {
     $controllerName = $params['controller'];
     $controllerName = str_replace('-', '', ucwords(strtolower($controllerName), '-'));
 
     $namespace = 'App\Controllers';
-
     if (array_key_exists('namespace', $params)) {
       $namespace .= '\\' . $params['namespace'];
     }
@@ -33,12 +35,31 @@ class Dispatcher {
     return $namespace . '\\' . $controllerName;
   }
 
+
   private function getActionName(array $params): string {
     $actionName = $params['action'];
     $actionName = lcfirst(str_replace('-', '', ucwords(strtolower($actionName), '-')));
 
     return $actionName;
   }
+
+
+  private function getObject(string $class_name): object {
+    $reflector = new ReflectionClass($class_name);
+    $constructor = $reflector->getConstructor();
+    if ($constructor === null) {
+      return new $class_name();
+    }
+    
+    $dependencies = [];
+    foreach ($constructor->getParameters() as $parameter) {
+      $type = (string) $parameter->getType();
+      $dependencies[] = $this->getObject($type);
+    }
+
+    return new $class_name(...$dependencies);
+  }
+
 
   function handle(string $path) {
     $params = $this->router->match($path);
@@ -49,10 +70,10 @@ class Dispatcher {
     }
 
     $controllerName = $this->getControllerName($params);
-    $action = $this->getActionName($params);
-    $args = $this->getActionArgument($controllerName, $action, $params);
+    $controller = $this->getObject($controllerName);
 
-    $controller = new $controllerName;
+    $action = $this->getActionName($params);
+    $args = $this->getActionArguments($controllerName, $action, $params);
     $controller->$action(...$args);
   }
 

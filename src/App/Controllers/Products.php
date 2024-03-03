@@ -5,29 +5,29 @@ use Framework\Viewer;
 
 class Products {
 
+  function __construct(
+    private Product $productModel,
+    private Viewer $viewer,
+  ) {}
+
   function index() {
-    $model = new Product;
-    $products = $model->getData();
+    $products = $this->productModel->getData();
 
-    $viewer = new Viewer;
-
-    echo $viewer->render('shared/header.php', [
+    echo $this->viewer->render('shared/header.php', [
       "title" => "All products"
     ]);
 
-    echo $viewer->render('Products/index.php', [
+    echo $this->viewer->render('Products/index.php', [
       "products" => $products
     ]);
   }
 
   function show(string $id) {
-    $viewer = new Viewer;
-
-    echo $viewer->render('shared/header.php', [
+    echo $this->viewer->render('shared/header.php', [
       "title" => "A single product"
     ]);
 
-    echo $viewer->render('Products/show.php', [
+    echo $this->viewer->render('Products/show.php', [
       "id" => $id
     ]);
   }
