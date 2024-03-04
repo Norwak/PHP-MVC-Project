@@ -13,6 +13,17 @@ class Products {
   ) {}
 
 
+  private function getProduct(string $id): array {
+    $product = $this->model->find($id);
+
+    if (!$product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return $product;
+  }
+
+
   function index() {
     $products = $this->model->findAll();
 
@@ -21,17 +32,14 @@ class Products {
     ]);
 
     echo $this->viewer->render('Products/index.php', [
-      "products" => $products
+      "products" => $products,
+      "total" => $this->model->getTotal(),
     ]);
   }
 
 
   function show(string $id) {
-    $product = $this->model->find($id);
-
-    if (!$product) {
-      throw new NotFoundException('Product not found');
-    }
+    $product = $this->getProduct($id);
 
     echo $this->viewer->render('shared/header.php', [
       "title" => "A single product"
@@ -74,8 +82,64 @@ class Products {
   
       echo $this->viewer->render('Products/new.php', [
         "errors" => $this->model->getErrors(),
+        "product" => $data,
       ]);
     };
+  }
+
+
+  function edit(string $id) {
+    $product = $this->getProduct($id);
+
+    echo $this->viewer->render('shared/header.php', [
+      "title" => "Edit Product"
+    ]);
+
+    echo $this->viewer->render('Products/edit.php', [
+      "product" => $product
+    ]);
+  }
+
+
+  function update(string $id) {
+    $product['name'] = $_POST['name'];
+    $product['description'] = $_POST['description'] ?: null;
+
+    $result = $this->model->update($id, $product);
+    if ($result) {
+      header("Location: /products/{$result['id']}/show");
+      exit();
+    } else {
+      $product['id'] = $id;
+
+      echo $this->viewer->render('shared/header.php', [
+        "title" => "Edit product"
+      ]);
+  
+      echo $this->viewer->render('Products/edit.php', [
+        "errors" => $this->model->getErrors(),
+        "product" => $product
+      ]);
+    };
+  }
+
+
+  function remove(string $id) {
+    $product = $this->getProduct($id);
+
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+      $this->model->remove($id);
+      header('Location: /products');
+      exit();
+    }
+
+    echo $this->viewer->render('shared/header.php', [
+      "title" => "Delete product"
+    ]);
+
+    echo $this->viewer->render('Products/remove.php', [
+      "product" => $product
+    ]);
   }
 
 }

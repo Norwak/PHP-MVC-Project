@@ -10,7 +10,7 @@ abstract class Model {
   protected array $errors = [];
 
   function __construct(
-    private Database $database,
+    protected Database $database,
   ) {}
 
 
@@ -84,6 +84,58 @@ abstract class Model {
     $stmt->execute();
 
     return $this->find($pdo->lastInsertId());
+  }
+
+
+  function update(string $id, array $data): array {
+    $pdo = $this->database->getConnection();
+
+    $this->validate($data);
+    if (!empty($this->errors)) return [];
+
+    $assignments = array_keys($data);
+    array_walk($assignments, function(&$value) {
+      $value = "$value = ?";
+    });
+    $assignments = implode(', ', $assignments);
+
+    $sql = "UPDATE {$this->getTable()} SET {$assignments} WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+
+    $i = 1;
+    foreach ($data as $value) {
+      $type = match(gettype($value)) {
+        "boolean" => PDO::PARAM_BOOL,
+        "integer" => PDO::PARAM_INT,
+        "NULL" => PDO::PARAM_NULL,
+        default => PDO::PARAM_STR,
+      };
+
+      $stmt->bindValue($i++, $value, $type);
+    }
+    $stmt->bindValue($i, $id, PDO::PARAM_INT);
+
+    $stmt->execute();
+
+    return $this->find($id);
+  }
+
+
+  function remove(string $id): array {
+    $pdo = $this->database->getConnection();
+
+    $item = $this->find($id);
+    unset($item['id']);
+
+    $sql = "DELETE FROM {$this->getTable()} WHERE id = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+    if ($stmt->execute()) {
+      return $item;
+    } else {
+      return [];
+    }
   }
 
 }
