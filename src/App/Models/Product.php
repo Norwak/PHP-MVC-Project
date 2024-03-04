@@ -7,4 +7,11 @@ class Product extends Model {
 
   // protected $table = 'products';
 
+
+  // protected function validate(array $data): void {
+  //   if (empty($data['name'])) {
+  //     $this->addError('name', 'Name is required');
+  //   };
+  // }
+
 }

@@ -7,15 +7,29 @@ use App\Database;
 abstract class Model {
 
   protected $table;
+  protected array $errors = [];
 
   function __construct(
     private Database $database,
   ) {}
 
 
+  protected function addError(string $field, string $message): void {
+    $this->errors[$field] = $message;
+  }
+
+
+  function getErrors() {
+    return $this->errors;
+  }
+
+
+  protected function validate(array $data): void {}
+
+
   private function getTable(): string {
     if ($this->table !== null) return $this->table;
-    
+
     $parts = explode("\\", $this::class);
     return strtolower(array_pop($parts));
   }
@@ -40,6 +54,36 @@ abstract class Model {
 
     $data = $stmt->fetch();
     return ($data) ?: [];
+  }
+
+
+  function create(array $data): array {
+    $pdo = $this->database->getConnection();
+
+    $this->validate($data);
+    if (!empty($this->errors)) return [];
+
+    $columns = implode(', ', array_keys($data));
+    $placeholders = implode(', ', array_fill(0, count($data), '?'));
+
+    $sql = "INSERT INTO {$this->getTable()} ({$columns}) VALUES ({$placeholders})";
+    $stmt = $pdo->prepare($sql);
+
+    $i = 1;
+    foreach ($data as $value) {
+      $type = match(gettype($value)) {
+        "boolean" => PDO::PARAM_BOOL,
+        "integer" => PDO::PARAM_INT,
+        "NULL" => PDO::PARAM_NULL,
+        default => PDO::PARAM_STR,
+      };
+
+      $stmt->bindValue($i++, $value, $type);
+    }
+
+    $stmt->execute();
+
+    return $this->find($pdo->lastInsertId());
   }
 
 }

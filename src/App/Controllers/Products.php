@@ -44,7 +44,38 @@ class Products {
 
 
   function showPage(string $title, string $id, string $page) {
+    echo $title, " ", $id, " ", $page;
+  }
 
+
+  function new() {
+    echo $this->viewer->render('shared/header.php', [
+      "title" => "New product"
+    ]);
+
+    echo $this->viewer->render('Products/new.php');
+  }
+
+
+  function create() {
+    $data = [
+      "name" => $_POST['name'],
+      "description" => $_POST['description'] ?: null,
+    ];
+
+    $result = $this->model->create($data);
+    if ($result) {
+      header("Location: /products/{$result['id']}/show");
+      exit();
+    } else {
+      echo $this->viewer->render('shared/header.php', [
+        "title" => "New product"
+      ]);
+  
+      echo $this->viewer->render('Products/new.php', [
+        "errors" => $this->model->getErrors(),
+      ]);
+    };
   }
 
 }
