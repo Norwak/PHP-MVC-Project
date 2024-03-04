@@ -3,16 +3,18 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Models\Product;
 use Framework\Viewer;
+use Framework\Exceptions\NotFoundException;
 
 class Products {
 
   function __construct(
-    private Product $productModel,
+    private Product $model,
     private Viewer $viewer,
   ) {}
 
+
   function index() {
-    $products = $this->productModel->getData();
+    $products = $this->model->findAll();
 
     echo $this->viewer->render('shared/header.php', [
       "title" => "All products"
@@ -23,17 +25,26 @@ class Products {
     ]);
   }
 
+
   function show(string $id) {
+    $product = $this->model->find($id);
+
+    if (!$product) {
+      throw new NotFoundException('Product not found');
+    }
+
     echo $this->viewer->render('shared/header.php', [
       "title" => "A single product"
     ]);
 
     echo $this->viewer->render('Products/show.php', [
-      "id" => $id
+      "product" => $product
     ]);
   }
+
 
   function showPage(string $title, string $id, string $page) {
 
   }
+
 }
