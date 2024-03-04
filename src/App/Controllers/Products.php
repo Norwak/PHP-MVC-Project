@@ -124,22 +124,25 @@ class Products {
   }
 
 
-  function remove(string $id) {
+  function delete(string $id) {
     $product = $this->getProduct($id);
-
-    if ($_SERVER["REQUEST_METHOD"] === "POST") {
-      $this->model->remove($id);
-      header('Location: /products');
-      exit();
-    }
 
     echo $this->viewer->render('shared/header.php', [
       "title" => "Delete product"
     ]);
 
-    echo $this->viewer->render('Products/remove.php', [
+    echo $this->viewer->render('Products/delete.php', [
       "product" => $product
     ]);
+  }
+
+
+  function remove(string $id) {
+    $product = $this->getProduct($id);
+
+    $this->model->remove($id);
+    header('Location: /products');
+    exit();
   }
 
 }

@@ -46,12 +46,12 @@ class Dispatcher {
   }
 
 
-  function handle(string $path) {
-    $params = $this->router->match($path);
+  function handle(string $path, string $method) {
+    $params = $this->router->match($path, $method);
 
     if (!$params) {
       http_response_code(404);
-      throw new NotFoundException("No route matched for '$path'");
+      throw new NotFoundException("No route matched for '$path' with method '$method'");
     }
 
     $controllerName = $this->getControllerName($params);

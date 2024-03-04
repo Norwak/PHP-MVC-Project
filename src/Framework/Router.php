@@ -32,7 +32,7 @@ class Router {
     ];
   }
 
-  function match(string $path): array {
+  function match(string $path, string $method): array {
     $path = urldecode($path);
     $path = trim($path, '/');
 
@@ -41,7 +41,13 @@ class Router {
 
       if (preg_match($pattern, $path, $matches)) {
         $matches = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-        return array_merge($matches, $route['params']);
+        $params = array_merge($matches, $route['params']);
+
+        if (array_key_exists("method", $params)) {
+          if (strtolower($method) !== strtolower($params['method'])) continue;
+        }
+
+        return $params;
       };
     }
     

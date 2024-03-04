@@ -16,7 +16,24 @@ $router->add('/product/{slug:[\w-]+}', [
   "action" => "show",
 ]);
 
-$router->add('/{controller}/{id:\d+}/{action}');
+// $router->add('/{controller}/{id:\d+}/{action}');
+
+$router->add('/{controller}/{id:\d+}/show', [
+  "action" => "show",
+]);
+$router->add('/{controller}/{id:\d+}/edit', [
+  "action" => "edit",
+]);
+$router->add('/{controller}/{id:\d+}/update', [
+  "action" => "update",
+]);
+$router->add('/{controller}/{id:\d+}/delete', [
+  "action" => "delete",
+]);
+$router->add('/{controller}/{id:\d+}/remove', [
+  "action" => "remove",
+  "method" => "post",
+]);
 
 $router->add('/home/index', [
   "controller" => "home",
