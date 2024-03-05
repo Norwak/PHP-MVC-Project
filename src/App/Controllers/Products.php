@@ -4,12 +4,12 @@ namespace App\Controllers;
 use App\Models\Product;
 use Framework\Viewer;
 use Framework\Exceptions\NotFoundException;
+use Framework\Controller;
 
-class Products {
+class Products extends Controller {
 
   function __construct(
     private Product $model,
-    private Viewer $viewer,
   ) {}
 
 
@@ -65,10 +65,12 @@ class Products {
   }
 
 
-  function create() {
+  function create() { 
+    $post = $this->request->post();
+
     $data = [
-      "name" => $_POST['name'],
-      "description" => $_POST['description'] ?: null,
+      "name" => $post['name'],
+      "description" => $post['description'] ?: null,
     ];
 
     $result = $this->model->create($data);
@@ -102,8 +104,10 @@ class Products {
 
 
   function update(string $id) {
-    $product['name'] = $_POST['name'];
-    $product['description'] = $_POST['description'] ?: null;
+    $post = $this->request->post();
+
+    $product['name'] = $post['name'];
+    $product['description'] = $post['description'] ?: null;
 
     $result = $this->model->update($id, $product);
     if ($result) {
