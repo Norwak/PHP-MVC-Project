@@ -60,7 +60,7 @@ class Dispatcher {
     $controllerName = $this->getControllerName($params);
     $controller = $this->container->get($controllerName);
     $controller->setRequest($request);
-    $controller->setViewer($this->container->get(Viewer::class));
+    $controller->setViewer($this->container->get(TemplateInterface::class));
 
     $action = $this->getActionName($params);
     $args = $this->getActionArguments($controllerName, $action, $params);

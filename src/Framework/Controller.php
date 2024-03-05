@@ -6,7 +6,7 @@ use Framework\Request;
 abstract class Controller {
 
   protected Request $request;
-  protected Viewer $viewer;
+  protected TemplateInterface $viewer;
 
 
   function setRequest(Request $request): void {
@@ -14,7 +14,7 @@ abstract class Controller {
   }
 
 
-  function setViewer(Viewer $viewer): void {
+  function setViewer(TemplateInterface $viewer): void {
     $this->viewer = $viewer;
   }
 

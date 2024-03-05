@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace App\Controllers;
 use App\Models\Product;
-use Framework\Viewer;
 use Framework\Exceptions\NotFoundException;
 use Framework\Controller;
 
@@ -27,11 +26,8 @@ class Products extends Controller {
   function index() {
     $products = $this->model->findAll();
 
-    echo $this->viewer->render('shared/header.php', [
-      "title" => "All products"
-    ]);
-
-    echo $this->viewer->render('Products/index.php', [
+    echo $this->viewer->render('Products/index.engine.php', [
+      "title" => "All products",
       "products" => $products,
       "total" => $this->model->getTotal(),
     ]);

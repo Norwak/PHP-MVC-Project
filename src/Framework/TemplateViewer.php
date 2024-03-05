@@ -2,9 +2,9 @@
 declare(strict_types=1);
 namespace Framework;
 
-class Viewer {
+class TemplateViewer implements TemplateInterface {
 
-  function render(string $template, array $data = []) {
+  function render(string $template, array $data = []): string {
     extract($data, EXTR_SKIP, );
 
     ob_start();

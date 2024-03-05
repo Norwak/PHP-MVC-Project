@@ -10,4 +10,8 @@ $container->set(App\Database::class, function() {
   return new App\Database($host, $db, $user, $password);
 });
 
+$container->set(Framework\TemplateInterface::class, function() {
+  return new Framework\TemplateEngine();
+});
+
 return $container;
