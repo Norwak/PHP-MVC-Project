@@ -1,29 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+{% extends "base.engine.php" %}
 
-  <title>{{title}}</title>
-</head>
-<body>
+{% block title %}Products{% endblock %}
 
-  <h1>Products</h1>
+{% block body %}
 
-  <a href="/products/new">New Product</a>
+<h1>Products</h1>
 
-  <p>Total: {{total}}</p>
+<a href="/products/new">New Product</a>
 
-  <?php foreach ($products as $product) { ?>
+<p>Total: {{total}}</p>
 
-    <h2>
-      <a href="/products/{{product['id']}}/show">
-        {{product['name']}}
-      </a>
-    </h2>
+<?php foreach ($products as $product) { ?>
 
-  <?php } ?>
+  <h2>
+    <a href="/products/{{product['id']}}/show">
+      {{product['name']}}
+    </a>
+  </h2>
 
-</body>
-</html>
+<?php } ?>
+
+{% endblock %}

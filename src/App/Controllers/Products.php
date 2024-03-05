@@ -27,7 +27,6 @@ class Products extends Controller {
     $products = $this->model->findAll();
 
     echo $this->viewer->render('Products/index.engine.php', [
-      "title" => "All products",
       "products" => $products,
       "total" => $this->model->getTotal(),
     ]);
@@ -37,11 +36,7 @@ class Products extends Controller {
   function show(string $id) {
     $product = $this->getProduct($id);
 
-    echo $this->viewer->render('shared/header.php', [
-      "title" => "A single product"
-    ]);
-
-    echo $this->viewer->render('Products/show.php', [
+    echo $this->viewer->render('Products/show.engine.php', [
       "product" => $product
     ]);
   }
@@ -53,11 +48,7 @@ class Products extends Controller {
 
 
   function new() {
-    echo $this->viewer->render('shared/header.php', [
-      "title" => "New product"
-    ]);
-
-    echo $this->viewer->render('Products/new.php');
+    echo $this->viewer->render('Products/new.engine.php');
   }
 
 
@@ -74,11 +65,8 @@ class Products extends Controller {
       header("Location: /products/{$result['id']}/show");
       exit();
     } else {
-      echo $this->viewer->render('shared/header.php', [
-        "title" => "New product"
-      ]);
   
-      echo $this->viewer->render('Products/new.php', [
+      echo $this->viewer->render('Products/new.engine.php', [
         "errors" => $this->model->getErrors(),
         "product" => $data,
       ]);
@@ -89,11 +77,7 @@ class Products extends Controller {
   function edit(string $id) {
     $product = $this->getProduct($id);
 
-    echo $this->viewer->render('shared/header.php', [
-      "title" => "Edit Product"
-    ]);
-
-    echo $this->viewer->render('Products/edit.php', [
+    echo $this->viewer->render('Products/edit.engine.php', [
       "product" => $product
     ]);
   }
@@ -111,12 +95,8 @@ class Products extends Controller {
       exit();
     } else {
       $product['id'] = $id;
-
-      echo $this->viewer->render('shared/header.php', [
-        "title" => "Edit product"
-      ]);
   
-      echo $this->viewer->render('Products/edit.php', [
+      echo $this->viewer->render('Products/edit.engine.php', [
         "errors" => $this->model->getErrors(),
         "product" => $product
       ]);
@@ -127,11 +107,7 @@ class Products extends Controller {
   function delete(string $id) {
     $product = $this->getProduct($id);
 
-    echo $this->viewer->render('shared/header.php', [
-      "title" => "Delete product"
-    ]);
-
-    echo $this->viewer->render('Products/delete.php', [
+    echo $this->viewer->render('Products/delete.engine.php', [
       "product" => $product
     ]);
   }
