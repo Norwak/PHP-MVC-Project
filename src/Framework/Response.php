@@ -35,8 +35,10 @@ class Response {
 
 
   function send(): void {
-    http_response_code($this->status_code);
-    
+    if ($this->status_code) {
+      http_response_code($this->status_code);
+    }
+
     foreach ($this->headers as $header) {
       header($header);
     }
