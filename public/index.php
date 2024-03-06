@@ -24,4 +24,5 @@ $method = $_SERVER['REQUEST_METHOD'];
 $request = new Framework\Request($uri, $method, $_GET, $_POST, $_FILES, $_COOKIE, $_SERVER);
 
 $dispatcher = new Framework\Dispatcher($router, $container);
-$dispatcher->handle($request);
+$response = $dispatcher->handle($request);
+$response->send();

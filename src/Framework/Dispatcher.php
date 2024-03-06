@@ -47,7 +47,7 @@ class Dispatcher {
   }
 
 
-  function handle(Request $request) {
+  function handle(Request $request): Response {
     $path = $request->path();
     $method = $request->method();
 
@@ -60,11 +60,12 @@ class Dispatcher {
     $controllerName = $this->getControllerName($params);
     $controller = $this->container->get($controllerName);
     $controller->setRequest($request);
+    $controller->setResponse($this->container->get(Response::class));
     $controller->setViewer($this->container->get(TemplateInterface::class));
 
     $action = $this->getActionName($params);
     $args = $this->getActionArguments($controllerName, $action, $params);
-    $controller->$action(...$args);
+    return $controller->$action(...$args);
   }
 
 }

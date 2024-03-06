@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Models\Product;
 use Framework\Exceptions\NotFoundException;
 use Framework\Controller;
+use Framework\Response;
 
 class Products extends Controller {
 
@@ -23,20 +24,20 @@ class Products extends Controller {
   }
 
 
-  function index() {
+  function index(): Response {
     $products = $this->model->findAll();
 
-    echo $this->viewer->render('Products/index.engine.php', [
+    return $this->view('Products/index.engine.php', [
       "products" => $products,
       "total" => $this->model->getTotal(),
     ]);
   }
 
 
-  function show(string $id) {
+  function show(string $id): Response {
     $product = $this->getProduct($id);
 
-    echo $this->viewer->render('Products/show.engine.php', [
+    return $this->view('Products/show.engine.php', [
       "product" => $product
     ]);
   }
@@ -47,12 +48,12 @@ class Products extends Controller {
   }
 
 
-  function new() {
-    echo $this->viewer->render('Products/new.engine.php');
+  function new(): Response {
+    return $this->view('Products/new.engine.php');
   }
 
 
-  function create() { 
+  function create(): Response { 
     $post = $this->request->post();
 
     $data = [
@@ -62,11 +63,9 @@ class Products extends Controller {
 
     $result = $this->model->create($data);
     if ($result) {
-      header("Location: /products/{$result['id']}/show");
-      exit();
+      return $this->redirect("/products/{$result['id']}/show");
     } else {
-  
-      echo $this->viewer->render('Products/new.engine.php', [
+      return $this->view('Products/new.engine.php', [
         "errors" => $this->model->getErrors(),
         "product" => $data,
       ]);
@@ -74,16 +73,16 @@ class Products extends Controller {
   }
 
 
-  function edit(string $id) {
+  function edit(string $id): Response {
     $product = $this->getProduct($id);
 
-    echo $this->viewer->render('Products/edit.engine.php', [
+    return $this->view('Products/edit.engine.php', [
       "product" => $product
     ]);
   }
 
 
-  function update(string $id) {
+  function update(string $id): Response {
     $post = $this->request->post();
 
     $product['name'] = $post['name'];
@@ -91,12 +90,11 @@ class Products extends Controller {
 
     $result = $this->model->update($id, $product);
     if ($result) {
-      header("Location: /products/{$result['id']}/show");
-      exit();
+      return $this->redirect("/products/{$result['id']}/show");
     } else {
       $product['id'] = $id;
   
-      echo $this->viewer->render('Products/edit.engine.php', [
+      return $this->view('Products/edit.engine.php', [
         "errors" => $this->model->getErrors(),
         "product" => $product
       ]);
@@ -104,21 +102,20 @@ class Products extends Controller {
   }
 
 
-  function delete(string $id) {
+  function delete(string $id): Response {
     $product = $this->getProduct($id);
 
-    echo $this->viewer->render('Products/delete.engine.php', [
+    return $this->view('Products/delete.engine.php', [
       "product" => $product
     ]);
   }
 
 
-  function remove(string $id) {
+  function remove(string $id): Response {
     $product = $this->getProduct($id);
 
     $this->model->remove($id);
-    header('Location: /products');
-    exit();
+    return $this->redirect('/products');
   }
 
 }
