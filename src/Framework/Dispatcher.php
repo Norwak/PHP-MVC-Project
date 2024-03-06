@@ -10,6 +10,7 @@ class Dispatcher {
   function __construct(
     private Router $router,
     private Container $container,
+    private array $middleware_classes
   ) {}
 
 
@@ -47,6 +48,24 @@ class Dispatcher {
   }
 
 
+  private function getMiddleware(array $params): array {
+    if (!array_key_exists("middleware", $params)) {
+      return [];
+    }
+
+    $middleware = explode('|', $params['middleware']);
+
+    array_walk($middleware, function (&$value) {
+      if (!array_key_exists($value, $this->middleware_classes)) {
+        throw new UnexpectedValueException("Middleware '$value' not found in config settings");
+      }
+
+      $value = $this->container->get($this->middleware_classes[$value]);
+    });
+    return $middleware;
+  }
+
+
   function handle(Request $request): Response {
     $path = $request->path();
     $method = $request->method();
@@ -59,13 +78,18 @@ class Dispatcher {
 
     $controllerName = $this->getControllerName($params);
     $controller = $this->container->get($controllerName);
-    $controller->setRequest($request);
     $controller->setResponse($this->container->get(Response::class));
     $controller->setViewer($this->container->get(TemplateInterface::class));
 
     $action = $this->getActionName($params);
     $args = $this->getActionArguments($controllerName, $action, $params);
-    return $controller->$action(...$args);
+    
+    $controller_handler = new ControllerRequestHandler($controller, $action, $args);
+
+    $middleware = $this->getMiddleware($params);
+
+    $middleware_handler = new MiddlewareRequestHandler($middleware, $controller_handler);
+    return $middleware_handler->handle($request);
   }
 
 }

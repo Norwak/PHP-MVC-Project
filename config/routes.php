@@ -20,6 +20,7 @@ $router->add('/product/{slug:[\w-]+}', [
 
 $router->add('/{controller}/{id:\d+}/show', [
   "action" => "show",
+  "middleware" => "deny|message|message",
 ]);
 $router->add('/{controller}/{id:\d+}/edit', [
   "action" => "edit",
