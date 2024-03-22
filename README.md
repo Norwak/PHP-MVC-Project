@@ -4,4 +4,4 @@ Project from a course.
 
 I couldn't resist making some changes when coding along.
 
-My complete overhaul is available here: [link](#).
+My complete overhaul is available here: [link](https://github.com/Norwak/PHP-MVC-Project-Overhaul).
